@@ -1,1 +1,1 @@
-include ':app', ':volley'
+final def var = include ':app', ':volley'

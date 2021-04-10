@@ -2,6 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SmartNavigator.iml" filepath="$PROJECT_DIR$/.idea/modules/SmartNavigator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SmartNavigator.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SmartNavigator.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/volley/SmartNavigator.volley.iml" filepath="$PROJECT_DIR$/.idea/modules/volley/SmartNavigator.volley.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/TruckNavigator-master.iml" filepath="$PROJECT_DIR$/.idea/modules/TruckNavigator-master.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/TruckNavigator-master.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/TruckNavigator-master.app.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/volley/TruckNavigator-master.volley.iml" filepath="$PROJECT_DIR$/.idea/modules/volley/TruckNavigator-master.volley.iml" />
