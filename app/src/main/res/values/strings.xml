@@ -98,4 +98,19 @@
     <string name="app_id">QFY89DXh1QummCoRlFzT</string>
     <string name="app_code">MW3f7j_rOCvq_PvGlxBW2w</string>
     <string name="license">G2SwXKC61hq1bY/o7Z96pldhOin/26rihRmkZa+18kelrLV4VepvuDB+cT+Ylb+aPNjqaPrlR/695TaC29ubMkXEpWCCCFnrQRUQ/7uDU8MWVjkk84xMu0zV1vm7dgFLrNG5E7zbvX086NbhxrvL7TSjecoHO/QCvawET3PSM9oJkfDX0wEa2zrTXpfg+bzIccblEDz+OReIl0/zH48OgBasreT3tlebVPhc21n4zj2bf/Iq4JJ+B6kJnHsZWqjw8NbnS+2u5udQiT/E+p772woOlOOLpVQPlhXiIVKAKWag7Lohc5dzzBH01bpAvh+p4BG7yOxwqB8qPerCc/n2mVggwjqXtOTe58ASMrvogpFIizdi34Ooh+Z7W402zmsiPOz4bRMdLNleBovLatRtpzyEFuvwpF8w3tXPxue773wudQND5ayUPw8X7ljCyQwDh2l+yD3I/Zg65DoCeDnA6DBhIA+ry0j+9YffByIUqgHKJtf8uUWjqAkD2Qmm81/z5TJMPS+RfrDwAt2yRffuA1FgDvz9puywopjOYeQlDQntmiLUEpvDF9gdlz+3HAH6D5Auexe0X/uVCVO7VE5GZP/xyuceF+t8VLH+JiQyyc88MZavfkMRhAfCYxYXmsillVZ1YYtPL87qdrU1/CoWVAyPHmiaGajRV3rCxGqXvu0=</string>
+
+
+    <!-- Connect Devices Activity -->
+    <string name="text_view_paired_devices">Paired Devices</string>
+    <string name="text_view_new_devices">Other Available Devices</string>
+    <string name="button_scan_for_new_devices">Scan For New Devices</string>
+
+    <!-- Toast and waring messages -->
+    <string name="does_not_have_bluetooth">This Device Does not Support Bluetooth</string>
+    <string name="no_paired_devices">No Paired Bluetooth Devices Found</string>
+    <string name="disconnect">Disconnect</string>
+
+    <!-- MainActivity -->
+    <string name="on">On</string>
+    <string name="off">Off</string>
 </resources>

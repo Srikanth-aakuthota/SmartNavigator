@@ -1743,7 +1743,6 @@ public class NavigationView implements Map.OnTransformListener {
 
     private void startGuidance(final Route route) {
 
-
         final VoiceCatalog voiceCatalog = VoiceCatalog.getInstance();
         // Get the list of voice packages from the voice catalog list
         List<VoicePackage> voicePackages = VoiceCatalog.getInstance().getCatalogList();
