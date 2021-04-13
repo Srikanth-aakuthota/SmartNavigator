@@ -466,10 +466,12 @@ public class NavigationView implements Map.OnTransformListener {
         /* Initialize the MapFragment, results will be given via the called back. */
         if (mapFragment != null) {
             final ApplicationContext context = new ApplicationContext(activity);
+          Log.d ("Srikanth", "BeforeInit");
             mapFragment.init(context, new OnEngineInitListener() {
 
                 @Override
                 public void onEngineInitializationCompleted(Error error) {
+                    Log.d ("Srikanth", "After" + error);
 
                     if (error == Error.NONE) {
 
@@ -1742,6 +1744,7 @@ public class NavigationView implements Map.OnTransformListener {
     }
 
     private void startGuidance(final Route route) {
+
 
         final VoiceCatalog voiceCatalog = VoiceCatalog.getInstance();
         // Get the list of voice packages from the voice catalog list

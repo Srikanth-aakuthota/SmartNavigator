@@ -2,8 +2,10 @@ package com.fourkites.trucknavigator;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +14,7 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.speech.tts.TextToSpeech;
@@ -22,6 +25,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -44,10 +48,12 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -101,6 +107,19 @@ public class NavigationActivity extends AppCompatActivity {
     private Set<BluetoothDevice> pairedDevices;
 
     /**
+     * the MAC address for the chosen device
+     */
+    String address = null;
+
+    private ProgressDialog progressDialog;
+    BluetoothSocket btSocket = null;
+    private boolean isBtConnected = false;
+    //SPP UUID. Look for it'
+    //This the SPP for the arduino(AVR)
+    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+    private int newConnectionFlag = 0;
+    /**
      * request to enable bluetooth form activity result
      */
     public static final int REQUEST_ENABLE_BT = 1;
@@ -141,12 +160,22 @@ public class NavigationActivity extends AppCompatActivity {
             PairedDevicesList();
         }
 
-        setBroadCastReceiver ();
+       setBroadCastReceiver ();
+        //press the button to start search new Devices
+        searchForNewDevices.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchForNewDevices.setEnabled(false);
+                bluetoothDevicesAdapter.clear();
+                PairedDevicesList();
+                NewDevicesList();
+            }
+        });
 
-        //Restoring the data during Activity Restart
+     //Restoring the data during Activity Restart
         if (savedInstanceState != null) {
             //savedState = savedInstanceState.getBundle("savedState");
-            restoreDataWhenActivityRestarts (savedInstanceState);
+            restoreDataWhenActivityRestarts(savedInstanceState);
         }
 
         // Initialize Text to Speech Engine
@@ -267,14 +296,41 @@ public class NavigationActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * fast way to call Toast
+     */
+    private void makeToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * to disconnect the bluetooth connection
+     */
+    private void Disconnect() {
+        if (btSocket != null) //If the btSocket is busy
+        {
+            try {
+                btSocket.close(); //close connection
+            } catch (IOException e) {
+                makeToast("Error");
+            }
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
-        Log.i(ACTIVITY_TAG, "onResume: ");
-
+        Log.i(ACTIVITY_TAG, "onResume: ");        
         LocalBroadcastManager.getInstance(this).registerReceiver(gpsInfoReceiver, new IntentFilter("GPS_INFO_UPDATE_ALERT"));
         if (navigationView != null && Navigator.navigationMode)
             navigationView.keepScreenOn();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Disconnect();
+        finish();
     }
 
     @Override
@@ -418,6 +474,17 @@ public class NavigationActivity extends AppCompatActivity {
             //Get the device MAC address , the last 17 char in the view
             String info = (String) parent.getItemAtPosition(position);
             String MACAddress = info.substring(info.length() - 17);
+            address= MACAddress;
+            
+			newConnectionFlag++;
+        
+		if (address != null) {
+            //call the class to connect to bluetooth
+            if (newConnectionFlag == 1) {
+                new ConnectBT().execute();
+            }
+        }
+
             //finish();
         }
     };
@@ -518,8 +585,8 @@ public class NavigationActivity extends AppCompatActivity {
             } else {
                 finish();
             }
-        }
-
+        }   
+		
         switch (requestCode) {
             case 100: {
                 switch (resultCode) {
@@ -650,6 +717,65 @@ public class NavigationActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * An AysncTask to connect to Bluetooth socket
+     */
+    private class ConnectBT extends AsyncTask<Void, Void, Void> {
+        private boolean connectSuccess = true;
+
+        @Override
+        protected void onPreExecute() {
+
+            //show a progress dialog
+            progressDialog = ProgressDialog.show(NavigationActivity.this,
+                    "Connecting...", "Please wait!!!");
+        }
+
+        //while the progress dialog is shown, the connection is done in background
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            try {
+                if (btSocket == null || !isBtConnected) {
+                    //get the mobile bluetooth device
+                    mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+                    //connects to the device's address and checks if it's available
+                    BluetoothDevice bluetoothDevice = mBluetoothAdapter.getRemoteDevice(address);
+
+                    //create a RFCOMM (SPP) connection
+                    btSocket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(myUUID);
+
+                    BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+
+                    //start connection
+                    btSocket.connect();
+                }
+
+            } catch (IOException e) {
+                //if the try failed, you can check the exception here
+                connectSuccess = false;
+            }
+
+            return null;
+        }
+
+        //after the doInBackground, it checks if everything went fine
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Log.e("Testing", connectSuccess + "");
+            if (!connectSuccess) {
+                makeToast("Connection Failed. Is it a SPP Bluetooth? Try again.");
+                finish();
+            } else {
+                isBtConnected = true;
+                makeToast("Connected");
+            }
+            progressDialog.dismiss();
+        }
+    }
+
     @Override
     protected void onDestroy() {
         if (tts != null)
@@ -657,9 +783,9 @@ public class NavigationActivity extends AppCompatActivity {
 
         Log.i(ACTIVITY_TAG, "onDestroy: ");
         // Make sure we're not doing discovery anymore
-        if (mBluetoothAdapter != null) {
+       if (mBluetoothAdapter != null) {
             mBluetoothAdapter.cancelDiscovery();
-        }
+        } 
 
         // Unregister broadcast listeners
         unregisterReceiver(mReceiver);
