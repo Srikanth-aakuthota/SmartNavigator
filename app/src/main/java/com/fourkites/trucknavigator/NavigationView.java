@@ -6,6 +6,7 @@ package com.fourkites.trucknavigator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -99,6 +100,7 @@ import com.here.android.mpa.search.ReverseGeocodeRequest2;
 
 import org.jsoup.Jsoup;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
@@ -224,7 +226,7 @@ public class NavigationView implements Map.OnTransformListener {
         queue = Volley.newRequestQueue(activity);
         this.selectedRoute = selectedRoute;
         m_route = selectedRoute.getM_route();
-
+this.activity.getParent ();
         settingUpUI();
     }
 
@@ -1706,14 +1708,45 @@ public class NavigationView implements Map.OnTransformListener {
         getCurrentPosition();
     }
 
+    /**
+     * used to send data to the micro controller
+     *
+     * @param data the data that will send prefer to be one char
+     */
+    private void sendData(String data) {
+        BluetoothSocket btSocket = NavigationActivity.btSocket;
+        if (btSocket != null) {
+            try {
+                btSocket.getOutputStream().write(data.getBytes());
+            } catch (IOException e) {
+                Log.d ("BlueTooth", "sendData: Error");
+            }
+        }
+    }
+    
+    
+
     private AudioPlayerDelegate player = new AudioPlayerDelegate() {
         @Override
-        public boolean playText(final String s) {
+        public boolean playText(final String voiceText) {
+            Log.d ("VoiceText", voiceText);
+
+            String textRight = "right";
+            String textLeft = "left";
+
+            if (voiceText.toLowerCase().indexOf(textRight.toLowerCase()) > -1) {
+                sendData ("R1");
+            }
+
+            if (voiceText.toLowerCase().indexOf(textLeft.toLowerCase()) > -1) {
+                sendData ("L1");
+            }
+
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    tts.speak(s, TextToSpeech.QUEUE_FLUSH, null);
+                    tts.speak(voiceText, TextToSpeech.QUEUE_FLUSH, null);
                 }
             });
             return true;

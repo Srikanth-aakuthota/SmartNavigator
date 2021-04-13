@@ -2,6 +2,7 @@ package com.fourkites.trucknavigator;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -99,6 +100,7 @@ public class NavigationActivity extends AppCompatActivity {
      * Return Intent extra (The device MAC address)
      */
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
+    public static  BluetoothSocket btSocket = null;
 
     /**
      * The adapter to get all bluetooth services
@@ -112,7 +114,6 @@ public class NavigationActivity extends AppCompatActivity {
     String address = null;
 
     private ProgressDialog progressDialog;
-    BluetoothSocket btSocket = null;
     private boolean isBtConnected = false;
     //SPP UUID. Look for it'
     //This the SPP for the arduino(AVR)
