@@ -35,7 +35,8 @@
             app:fabSize="auto" />
     </RelativeLayout>
 
-    <include layout="@layout/splash_layout"/>
+    <include layout="@layout/splash_layout" />
+
     <LinearLayout
         android:id="@+id/appLayout"
         android:layout_width="match_parent"
